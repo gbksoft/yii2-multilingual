@@ -57,14 +57,6 @@ CREATE TABLE `post_translation` (
 // config.php
 return [
     'modules' => [
-        'swagger' => [
-            'class' => SwaggerModule::class,
-        ],
-        'rbac' => [
-            'class' => RbacModule::class,
-            'layout' => 'left-menu',
-            'mainLayout' => '@app/views/layouts/main.php',
-        ],
         'language' => [
             'class' => \gbksoft\multilingual\Module::class,
         ],
