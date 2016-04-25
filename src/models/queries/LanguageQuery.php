@@ -30,4 +30,21 @@ class LanguageQuery extends ActiveQuery
     {
         return parent::all($db);
     }
+
+    /**
+     * @param string $url
+     * @return $this
+     */
+    public function getByUrl($url)
+    {
+        return $this->where(['url' => $url]);
+    }
+
+    /**
+     * @return $this
+     */
+    public function getDefault()
+    {
+        return $this->where(['is_default' => 1]);
+    }
 }

@@ -5,6 +5,7 @@
  */
 namespace gbksoft\multilingual\models;
 
+use gbksoft\multilingual\components\LanguageQueryFactory;
 use gbksoft\multilingual\models\queries\LanguageQuery;
 use Yii;
 use yii\db\ActiveRecord;
@@ -60,6 +61,6 @@ class Language extends ActiveRecord
      */
     public static function find()
     {
-        return Yii::createObject(LanguageQuery::class, [get_called_class()]);
+        return Yii::createObject(LanguageQueryFactory::class)->create();
     }
 }

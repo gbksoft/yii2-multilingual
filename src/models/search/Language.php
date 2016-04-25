@@ -5,13 +5,13 @@
  */
 namespace gbksoft\multilingual\models\search;
 
-use gbksoft\multilingual\models\Language as ManiLanguage;
+use gbksoft\multilingual\models\Language as MainLanguage;
 use yii\data\ActiveDataProvider;
 
 /**
  * Class Language
  */
-class Language extends ManiLanguage
+class Language extends MainLanguage
 {
     /**
      * @inheritdoc
