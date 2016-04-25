@@ -50,3 +50,127 @@ CREATE TABLE `post_translation` (
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB
 
 ```
+
+### Подключение модуля для редактирования/создания языков
+
+```php
+// config.php
+return [
+    'modules' => [
+        'swagger' => [
+            'class' => SwaggerModule::class,
+        ],
+        'rbac' => [
+            'class' => RbacModule::class,
+            'layout' => 'left-menu',
+            'mainLayout' => '@app/views/layouts/main.php',
+        ],
+        'language' => [
+            'class' => \gbksoft\multilingual\Module::class,
+        ],
+    ]
+];
+```
+
+### Подключение в entity модель
+
+```php
+class Post extends ActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%post}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'ml' => [
+                'class' => Multilingual::class,
+                'translationModelName' => PostTranslation::class,
+                'translationOwnerField' => 'post_id',
+                'languageField' => 'language_id',
+            ],
+        ];
+    }
+}
+```
+
+### Модель переводов
+
+```php
+/**
+ * Class PostTranslation
+ *
+ * @property integer $post_id
+ * @property integer $language_id
+ * @property string $name
+ * @property string $text
+ */
+class PostTranslation extends ActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%post_translation}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'text', 'post_id', 'language_id'], 'required'],
+            [['post_id', 'language_id'], 'unique', 'targetAttribute' => ['post_id', 'language_id']],
+            [['name', 'text'], 'safe'],
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPost() {
+        return $this->hasOne(Post::class, ['id' => 'post_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLanguage() {
+        return $this->hasOne(Language::class, ['id' => 'language_id']);
+    }
+}
+```
+
+### Использование в котроллере
+
+```php
+/* in post array
+ [
+    'Post' => [ << model form name ($post->formName())
+        'en-EN' => [
+            'name' => '999999',
+            'text' => '9999997777'
+        ],
+        'ru-RU' => [
+            'name' => '777777',
+            'text' => '8888888'
+        ],
+    ]
+]
+ */
+$post->saveTranslations(\Yii::$app->request->post());
+
+$post->getTranslation('en-EN')->one(); // en language
+$post->getTranslation()->one(); // default language (Yii::$app->language)
+$post->getTranslations()->all(); // all languages
+```
